@@ -5,3 +5,7 @@ strategies
 .ipynb_checkpoints
 __pycache__
 *.pyc
+*.db
+.idea
+research/examples
+csv

@@ -3,6 +3,5 @@ compare_vnpy
 .vntrader
 strategies
 .ipynb_checkpoints
-*.ipynb
 __pycache__
 *.pyc

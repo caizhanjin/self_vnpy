@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 import sqlite3
 
+from tools.wapper import run_time
+
 
 class DatabaseSqlite(object):
     """sqlite 数据库操作类"""
@@ -13,7 +15,9 @@ class DatabaseSqlite(object):
             self.database_path = database_path
         self.connect()
 
-    def query_future(self, symbol='', interval='1m', begin_date='', end_date='', used_close=False, fields=None):
+    @run_time
+    def query_future(self, symbol='', interval='1m', begin_date=None,
+                     end_date=None, fields=None, used_close=False):
         """
         @param: interval ('1m', 'd')
         """

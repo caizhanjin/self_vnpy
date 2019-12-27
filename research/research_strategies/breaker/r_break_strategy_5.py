@@ -10,7 +10,6 @@ from vnpy.app.cta_strategy import (
     ArrayManager,
     SampleBarData,
 )
-from datetime import time
 
 
 class RBreakStrategy(CtaTemplate):
@@ -30,10 +29,13 @@ class RBreakStrategy(CtaTemplate):
     sell_break = 0  # 突破卖出价
     buy_break = 0  # 突破买入价
 
+    long_stop = 0
+    short_stop = 0
+
     is_new_today = False
 
     parameters = ["break_rate", "stop_rate", "tend_length", "fixed_size"]
-    variables = ["buy_break", "sell_break", "middle_line"]
+    variables = ["buy_break", "sell_break", "middle_line", "long_stop", "short_stop"]
 
     def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
         super(RBreakStrategy, self).__init__(
@@ -43,12 +45,12 @@ class RBreakStrategy(CtaTemplate):
         self.bg = BarGenerator(self.on_bar)
         self.am = ArrayManager()
 
-        self.am_day = ArrayManager(25)
+        self.am_day = ArrayManager(self.tend_length + 2)
         self.bar_today = SampleBarData()
 
     def on_init(self):
         self.write_log("策略初始化")
-        self.load_bar(10)
+        self.load_bar(40)
 
     def on_start(self):
         self.write_log("策略启动")
@@ -98,6 +100,9 @@ class RBreakStrategy(CtaTemplate):
 
         if not is_exit_time:
             if self.pos == 0:
+                self.long_stop = 0
+                self.short_stop = 0
+
                 # 过滤：下午14点后不交易
                 is_fit_trade = True
                 if 14 <= bar.datetime.hour <= 15:
@@ -118,12 +123,12 @@ class RBreakStrategy(CtaTemplate):
                         self.short(short_entry, self.fixed_size, stop=True)
 
             elif self.pos > 0:
-                long_stop = self.bar_today.high_price * (1 - self.stop_rate / 100)
-                self.sell(long_stop, abs(self.pos), stop=True)
+                self.long_stop = self.bar_today.high_price * (1 - self.stop_rate / 100)
+                self.sell(self.long_stop, abs(self.pos), stop=True)
 
             elif self.pos < 0:
-                short_stop = self.bar_today.low_price * (1 + self.stop_rate / 100)
-                self.cover(short_stop, abs(self.pos), stop=True)
+                self.short_stop = self.bar_today.low_price * (1 + self.stop_rate / 100)
+                self.cover(self.short_stop, abs(self.pos), stop=True)
 
         else:
             if self.pos > 0:

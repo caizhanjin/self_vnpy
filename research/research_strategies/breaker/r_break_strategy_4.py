@@ -10,7 +10,6 @@ from vnpy.app.cta_strategy import (
     ArrayManager,
     SampleBarData,
 )
-from datetime import time
 
 
 class RBreakStrategy(CtaTemplate):

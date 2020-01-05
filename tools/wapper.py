@@ -1,4 +1,4 @@
-# -*- utf-8 -*-
+# -*- coding:utf-8 -*-
 import time
 
 
@@ -8,7 +8,7 @@ def run_time(func):
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
-        print(f'Function:{func.__name__} runtime is {end_time-start_time}s')
+        print(f'Function : {func.__name__} runtime is {end_time-start_time}s')
         return result
     return wrapper
 

@@ -5,7 +5,14 @@ from tools.wapper import run_time
 
 
 class DatabaseSqlite(object):
-    """sqlite 数据库操作类"""
+    """
+    sqlite 数据库操作类
+    调用示例：
+    from tools.database import DatabaseSqlite
+
+    queryset = DatabaseSqlite()
+    result = queryset.query_future(symbol='rb2001', begin_date='2019-11-11', end_date='2019-11-11')
+    """
     database_path = "C:\\self_vnpy\\.vntrader\\database.db"
     db_connect = object
     cursor = object

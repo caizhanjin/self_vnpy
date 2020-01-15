@@ -1,0 +1,17 @@
+{
+  "BU": {
+    "name": "沥青",
+    "exchange": "上期所",
+    "exchange_code": "SHFE",
+    "multiplier": 10,
+    "minimum_change": 2
+  },
+  "RB": {
+    "name": "螺纹钢",
+    "exchange": "上期所",
+    "exchange_code": "SHFE",
+    "multiplier": 10,
+    "minimum_change": 1
+  }
+
+}

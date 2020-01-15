@@ -18,8 +18,7 @@ class TDXData(object):
     @staticmethod
     def clean_csv_single(csv_file_path, save_file_path):
         """处理下载csv文件"""
-        # save_file_path = os.path.join(save_path, os.path.basename(csv_file_path))
-        header = ['datetime', 'open', 'high', 'low', 'close', 'volume']
+        header = ['Datetime', 'Open', 'High', 'Low', 'Close', 'Volume']
         csv_list = []
 
         with open(csv_file_path) as csv_file:
@@ -45,3 +44,12 @@ class TDXData(object):
             writer.writerows([header])
             writer.writerows(csv_list)
 
+
+if __name__ == "__main__":
+    source_path = "C:\\self_vnpy\\history_data\\88_source"
+    deal_path = "C:\\self_vnpy\\history_data\\88_deal"
+
+    # source_path = "C:\\self_vnpy\\history_data\\99_source"
+    # deal_path = "C:\\self_vnpy\\history_data\\99_deal"
+
+    TDXData.clean_csv_file(source_path, deal_path)

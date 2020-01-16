@@ -17,8 +17,8 @@ if __name__ == "__main__":
     write_cursor = write_db_connect.cursor()
 
     write_cursor.execute("select max(id) from dbbardata_copy1")
-    id_result = write_cursor.fetchone()
-    max_id = 0 if not id_result else id_result
+    id_result = write_cursor.fetchone()[0]
+    max_id = 0 if id_result is None else id_result
 
     query_sql = """
     select 
@@ -27,8 +27,6 @@ if __name__ == "__main__":
         where id > %s 
         order by id
     """ % max_id
-
-    print(query_sql)
 
     read_cursor.execute(query_sql)
     results = read_cursor.fetchall()

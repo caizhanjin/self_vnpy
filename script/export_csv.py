@@ -1,4 +1,5 @@
 # -*- coding:utf8 -*-
+# 导出历史数据为csv
 import sqlite3
 import os
 import csv
@@ -7,7 +8,7 @@ import time
 
 if __name__ == "__main__":
     start_time = time.time()
-    # csv本地保存路径
+    # csv本地保存路径，默认当前文件下history_data
     save_path = ".\\history_data"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -28,7 +29,7 @@ if __name__ == "__main__":
 
         query_sql = """
             SELECT 
-                symbol, datetime, interval, volume, open_price, high_price, close_price 
+                datetime, open_price, high_price, low_price, close_price, volume
             FROM dbbardata
                 WHERE symbol='%s' AND interval='%s'
                 ORDER BY datetime ASC
@@ -37,7 +38,8 @@ if __name__ == "__main__":
         cursor.execute(query_sql)
         query_results = cursor.fetchall()
 
-        save_file_path = os.path.join(save_path, symbol_item[0] + ".csv")
+        csv_name = symbol_item[0] + "_" + symbol_item[1] + "_" + symbol_item[2] + ".csv"
+        save_file_path = os.path.join(save_path, csv_name)
         with open(save_file_path, mode="wt", encoding="utf8", newline="") as f:
             writer = csv.writer(f)
             writer.writerows([header])

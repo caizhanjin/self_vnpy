@@ -1,5 +1,8 @@
 # -*- coding:utf-8 -*-
 import sqlite3
+import csv
+import pandas as pd
+import numpy as np
 
 from tools.wapper import run_time
 
@@ -22,7 +25,6 @@ class DatabaseSqlite(object):
             self.database_path = database_path
         self.connect()
 
-    @run_time
     def query_future(self, symbol='', interval='1m', begin_date=None,
                      end_date=None, fields=None, used_close=False):
         """
@@ -50,6 +52,58 @@ class DatabaseSqlite(object):
             self.close()
 
         return result
+
+    def import_csv_single(self, csv_file_path, symbol, exchange, interval="1m"):
+        """通过csv插入/更新数据库数据"""
+        data_frame = pd.read_csv(csv_file_path)
+        data_frame.sort_values(by="Datetime", ascending=True, inplace=True)
+
+        for index, row in data_frame.iterrows():
+            query_sql = """
+            SELECT COUNT(*) FROM dbbardata WHERE symbol='%s' AND interval='%s' AND datetime='%s'
+            """ % (symbol, interval, row["Datetime"])
+            self.cursor.execute(query_sql)
+            count = self.cursor.fetchone()[0]
+
+            if count > 0:
+                update_sql = """
+                UPDATE dbbardata 
+                SET 
+                    volume='%s', open_price='%s', high_price='%s', low_price='%s', close_price='%s' 
+                WHERE 
+                    symbol='%s' AND interval='%s' AND datetime='%s'
+                """ % (
+                    row["Volume"],
+                    row["Open"],
+                    row["High"],
+                    row["Low"],
+                    row["Close"],
+                    symbol,
+                    interval,
+                    row["Datetime"]
+                )
+                self.cursor.execute(update_sql)
+            else:
+                insert_sql = """
+                insert into 
+                    dbbardata(symbol, exchange, datetime, interval, volume, open_interest, open_price, high_price, low_price, close_price)
+                values 
+                    ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
+                """ % (
+                    symbol,
+                    exchange,
+                    row["Datetime"],
+                    interval,
+                    row["Volume"],
+                    "",
+                    row["Open"],
+                    row["High"],
+                    row["Low"],
+                    row["Close"],
+                )
+                self.cursor.execute(insert_sql)
+
+        self.db_connect.commit()
 
     def connect(self):
         self.db_connect = sqlite3.connect(self.database_path)

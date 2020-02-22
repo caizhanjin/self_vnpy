@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import sqlite3
 import csv
+import time
 import pandas as pd
 import numpy as np
 
@@ -55,13 +56,18 @@ class DatabaseSqlite(object):
 
     def import_csv_single(self, csv_file_path, symbol, exchange, interval="1m"):
         """通过csv插入/更新数据库数据"""
+        print(f"开始导入：{symbol}")
+        start_time = time.time()
+
         data_frame = pd.read_csv(csv_file_path)
         data_frame.sort_values(by="Datetime", ascending=True, inplace=True)
 
         for index, row in data_frame.iterrows():
+            datetime = row["Datetime"].replace('/', '-')
+
             query_sql = """
             SELECT COUNT(*) FROM dbbardata WHERE symbol='%s' AND interval='%s' AND datetime='%s'
-            """ % (symbol, interval, row["Datetime"])
+            """ % (symbol, interval, datetime)
             self.cursor.execute(query_sql)
             count = self.cursor.fetchone()[0]
 
@@ -80,7 +86,7 @@ class DatabaseSqlite(object):
                     row["Close"],
                     symbol,
                     interval,
-                    row["Datetime"]
+                    datetime
                 )
                 self.cursor.execute(update_sql)
             else:
@@ -92,7 +98,7 @@ class DatabaseSqlite(object):
                 """ % (
                     symbol,
                     exchange,
-                    row["Datetime"],
+                    datetime,
                     interval,
                     row["Volume"],
                     "",
@@ -105,6 +111,8 @@ class DatabaseSqlite(object):
 
         self.db_connect.commit()
 
+        print(f"{symbol} 导入完成，耗时 {time.time() - start_time} s")
+
     def connect(self):
         self.db_connect = sqlite3.connect(self.database_path)
         self.cursor = self.db_connect.cursor()
@@ -113,3 +121,13 @@ class DatabaseSqlite(object):
         self.cursor.close()
         self.db_connect.close()
 
+
+if __name__ == "__main__":
+    DatabaseSqlite = DatabaseSqlite()
+
+    DatabaseSqlite.import_csv_single(
+        csv_file_path="C:\\self_vnpy\\history_data\\99\\FU99_SHFE.csv",
+        symbol="FU99",
+        exchange="SHFE",
+        interval="1m"
+    )

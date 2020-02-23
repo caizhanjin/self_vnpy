@@ -10,3 +10,4 @@ __pycache__
 research/examples
 csv
 history_data
+/venv/

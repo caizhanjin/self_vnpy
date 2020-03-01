@@ -30,7 +30,7 @@ class SingleTrendStrategy(CtaTemplate):
 
     is_new_today = False
 
-    parameters = []
+    parameters = ["long_length", "short_length", "short_stop_rate", "long_stop_rate"]
     variables = []
 
     def __init__(self, cta_engine, strategy_name, vt_symbol, setting):

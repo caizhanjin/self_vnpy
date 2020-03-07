@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import unittest
 
-from tools.database import DatabaseSqlite
+from libs.db.sqlite import DatabaseSqlite
 
 
 class TestDatabase(unittest.TestCase):

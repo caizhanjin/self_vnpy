@@ -54,63 +54,63 @@ class DatabaseSqlite(object):
 
         return result
 
-    def import_csv_single(self, csv_file_path, symbol, exchange, interval="1m"):
+    def import_csv_single(self, csv_file_path, symbol, exchange, interval="1m",
+                          datetime="datetime", open="open", high="high", low="low", close="close", volume="volume"):
         """通过csv插入/更新数据库数据"""
-        print(f"开始导入：{symbol}")
-        start_time = time.time()
-
         data_frame = pd.read_csv(csv_file_path)
-        data_frame.sort_values(by="Datetime", ascending=True, inplace=True)
 
-        for index, row in data_frame.iterrows():
-            datetime = row["Datetime"].replace('/', '-')
-
-            query_sql = """
-            SELECT COUNT(*) FROM dbbardata WHERE symbol='%s' AND interval='%s' AND datetime='%s'
-            """ % (symbol, interval, datetime)
-            self.cursor.execute(query_sql)
-            count = self.cursor.fetchone()[0]
-
-            if count > 0:
-                update_sql = """
-                UPDATE dbbardata 
-                SET 
-                    volume='%s', open_price='%s', high_price='%s', low_price='%s', close_price='%s' 
-                WHERE 
-                    symbol='%s' AND interval='%s' AND datetime='%s'
-                """ % (
-                    row["Volume"],
-                    row["Open"],
-                    row["High"],
-                    row["Low"],
-                    row["Close"],
-                    symbol,
-                    interval,
-                    datetime
-                )
-                self.cursor.execute(update_sql)
-            else:
-                insert_sql = """
-                insert into 
-                    dbbardata(symbol, exchange, datetime, interval, volume, open_interest, open_price, high_price, low_price, close_price)
-                values 
-                    ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
-                """ % (
-                    symbol,
-                    exchange,
-                    datetime,
-                    interval,
-                    row["Volume"],
-                    "",
-                    row["Open"],
-                    row["High"],
-                    row["Low"],
-                    row["Close"],
-                )
-                self.cursor.execute(insert_sql)
+        self.update_from_df(
+            df=data_frame,
+            exchange=exchange,
+            symbol=symbol,
+            interval=interval,
+            datetime=datetime,
+            open=open,
+            high=high,
+            low=low,
+            close=close,
+            volume=volume
+        )
 
         self.db_connect.commit()
 
+    def update_from_df(self, df, exchange, symbol, interval,
+                       datetime="datetime", time_handler_type="",
+                       open="open", high="high", low="low", close="close", volume="volume"):
+        """批量更新dataframe格式数据
+        datetime格式：2019-5-10 13:00
+        @:param time_handler_type：nanometre[纳米数] timestamp[时间戳]
+        """
+        print(f"开始导入：{symbol}")
+        start_time = time.time()
+
+        df.sort_values(by="datetime", ascending=True, inplace=True)
+
+        for index, row in df.iterrows():
+            date = row[datetime]
+            if time_handler_type == "":
+                date = date.replace('/', '-')
+                date = date if len(date) <= 19 else date[: 19]
+            elif time_handler_type == "nanometre":
+                date = time.localtime(date / 1000000000)
+                date = time.strftime("%Y-%m-%d %H:%M:%S", date)
+            elif time_handler_type == "timestamp":
+                date = time.localtime(int(date))
+                date = time.strftime("%Y-%m-%d %H:%M:%S", date)
+
+            self.update_one_row(
+                exchange=exchange,
+                symbol=symbol,
+                interval=interval,
+                datetime=date,
+                open=float(row[open]),
+                high=float(row[high]),
+                low=float(row[low]),
+                close=float(row[close]),
+                volume=float(row[volume])
+            )
+
+        self.db_connect.commit()
         print(f"{symbol} 导入完成，耗时 {time.time() - start_time} s")
 
     def update_one_row(self, exchange, symbol, interval, datetime,
@@ -140,44 +140,6 @@ class DatabaseSqlite(object):
                 ('%s', '%s', '%s', '%s', %s, '%s', %s, %s, %s, %s)
             """ % (symbol, exchange, datetime, interval, volume, "", open, high, low, close)
             self.cursor.execute(insert_sql)
-
-    def update_from_df(self, df, exchange, symbol, interval,
-                       datetime="datetime", time_handler_type="",
-                       open="open", high="high", low="low", close="close", volume="volume"):
-        """批量更新dataframe格式数据
-        datetime格式：2019-5-10 13:00
-        @:param time_handler_type：nanometre[纳米数] timestamp[时间戳]
-        """
-        print(f"开始导入：{symbol}")
-        start_time = time.time()
-
-        df.sort_values(by="datetime", ascending=True, inplace=True)
-
-        for index, row in df.iterrows():
-            date = row[datetime]
-            if time_handler_type == "":
-                date = date.replace('/', '-')
-            elif time_handler_type == "nanometre":
-                date = time.localtime(date / 1000000000)
-                date = time.strftime("%Y-%m-%d %H:%M:%S", date)
-            elif time_handler_type == "timestamp":
-                date = time.localtime(int(date))
-                date = time.strftime("%Y-%m-%d %H:%M:%S", date)
-
-            self.update_one_row(
-                exchange=exchange,
-                symbol=symbol,
-                interval=interval,
-                datetime=date,
-                open=float(row[open]),
-                high=float(row[high]),
-                low=float(row[low]),
-                close=float(row[close]),
-                volume=float(row[volume])
-            )
-
-        self.db_connect.commit()
-        print(f"{symbol} 导入完成，耗时 {time.time() - start_time} s")
 
     def connect(self):
         self.db_connect = sqlite3.connect(self.database_path)

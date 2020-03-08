@@ -53,7 +53,7 @@ def sync_db():
                 time_handler_type="nanometre"
             )
         except Exception as error:
-            print(f"{item['symbol_tq']} 导入失败，原因：{error}")
+            print(f"{item['symbol_tq']} 同步失败，原因：{error}")
 
     queryset.close()
 

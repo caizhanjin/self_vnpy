@@ -43,42 +43,57 @@ from tqsdk.tools import DataDownloader
 from os import path
 
 from configs.main_configs import load_settings
+from libs.db.sqlite import DatabaseSqlite
+
 
 SETTINGS = load_settings()
 
 default_settings = {
     "save_path": SETTINGS["tqdata_save_path"],
     "cycle": 1 * 60,  # 1min
-    "start_dt": date(2019, 9, 1),
-    "end_dt": date(2019, 9, 4),
+    "interval": "1m",
+    "start_dt": date(2020, 3, 5),
+    "end_dt": date(2020, 3, 8),
+
 }
 
 download_list = [
     {
         "symbol": "KQ.i@SHFE.bu",
-        "save_name": "BU_99_SHFE.csv",
     },
     {
         "symbol": "KQ.i@SHFE.cu",
-        "save_name": "CU_99_SHFE.csv",
+    },
+    {
+        "symbol": "SHFE.cu2005",
     },
 ]
 
 
-def download():
+def download(return_paths=False):
     api = TqApi(TqSim())
 
     download_tasks = {}
+    csv_paths = []
 
     for item in download_list:
         save_path = item.get("save_path", default_settings["save_path"])
+        symbol = item["symbol"]
+        start_dt = item.get("start_dt", default_settings["start_dt"])
+        end_dt = item.get("end_dt", default_settings["end_dt"])
+        interval = item.get("interval", default_settings["interval"])
+        csv_file_name = symbol + "_" + interval + "_" + \
+                        start_dt.strftime("%Y%m%d") + "_" + end_dt.strftime("%Y%m%d") + ".csv"
+        csv_file_path = path.join(save_path, csv_file_name)
+        if return_paths:
+            csv_paths.append(csv_file_path)
         download_tasks[item["symbol"]] = DataDownloader(
             api,
-            symbol_list=item["symbol"],
+            symbol_list=symbol,
             dur_sec=item.get("cycle", default_settings["cycle"]),
-            start_dt=item.get("start_dt", default_settings["start_dt"]),
-            end_dt=item.get("end_dt", default_settings["end_dt"]),
-            csv_file_name=path.join(save_path, item["save_name"])
+            start_dt=start_dt,
+            end_dt=end_dt,
+            csv_file_name=csv_file_path
         )
 
     with closing(api):
@@ -86,6 +101,67 @@ def download():
             api.wait_update()
             print("progress: ", {k: ("%.2f%%" % v.get_progress()) for k, v in download_tasks.items()})
 
+    if return_paths:
+        return csv_paths
+
+
+def sync_db(csv_paths: list):
+    """同步下载csv数据库
+    @:param csv_path_list 同步csv文件列表，注：必须是天勤下载的csv格式，如KQ.i@SHFE.cu_20200305_20200308.csv
+    """
+    queryset = DatabaseSqlite()
+
+    for item in csv_paths:
+        csv_name = path.basename(item)
+        csv_name_split1 = csv_name.split("@")
+        index_name = ""
+        if len(csv_name_split1) == 1:
+            csv_name_split2 = csv_name_split1[0].split("_")
+        else:
+            csv_name_split2 = csv_name_split1[1].split("_")
+            if csv_name_split1[0] == "KQ.i":
+                index_name = "99"
+            elif csv_name_split1[0] == "KQ.m":
+                index_name = "88"
+
+        csv_name_split3 = csv_name_split2[0].split(".")
+        exchange = csv_name_split3[0]
+        symbol = csv_name_split3[1] if not index_name else csv_name_split3[1] + index_name
+        interval = csv_name_split2[1]
+        head_prefix = csv_name.split("_")[0]
+
+        queryset.import_csv_single(
+            csv_file_path=item,
+            symbol=symbol,
+            exchange=exchange,
+            interval=interval,
+            datetime="datetime",
+            open=head_prefix + ".open",
+            high=head_prefix + ".high",
+            low=head_prefix + ".low",
+            close=head_prefix + ".close",
+            volume=head_prefix + ".volume"
+        )
+
+    queryset.close()
+
+
+def download_and_sync():
+    """下载并同步数据库"""
+    csv_path_list = download(return_paths=True)
+    sync_db(csv_path_list)
+
 
 if __name__ == "__main__":
-    download()
+    # download()
+
+    # csv_path_list = [
+    #     "C:\\self_vnpy\\history_data\\tq\\KQ.i@SHFE.bu_1m_20200305_20200308.csv",
+    #     "C:\\self_vnpy\\history_data\\tq\\SHFE.cu2005_1m_20200305_20200308.csv",
+    #     "C:\\self_vnpy\\history_data\\tq\\KQ.i@SHFE.cu_1m_20200305_20200308.csv"
+    # ]
+    # sync_db(csv_path_list)
+
+    download_and_sync()
+
+

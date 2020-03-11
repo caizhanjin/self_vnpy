@@ -1,0 +1,81 @@
+Local History Data：
+
+------------------Time from 2010-1-1 ~ 2020-3-12------------------
+SHFE 上期所
+RB 螺纹钢
+BU 沥青
+RU 橡胶
+FU 燃油
+AU 黄金
+AG 白银
+CU 铜
+
+DCE 大商所
+P 棕榈
+Y 豆油
+JD 鸡蛋
+
+CZCE 郑商所
+SR 白糖
+TA PTA
+CF 棉花
+MA 甲醇
+
+
+default_settings = {
+    "save_path": SETTINGS["tqdata_save_path"],
+    "cycle": 1 * 60,  # 1min
+    "interval": "1m",
+    "start_dt": date(2010, 1, 1),
+    "end_dt": date(2020, 3, 12),
+}
+
+download_list = [
+    {
+        "symbol": "KQ.i@SHFE.rb",
+    },
+    {
+        "symbol": "KQ.i@SHFE.bu",
+    },
+    {
+        "symbol": "KQ.i@SHFE.ru",
+    },
+    {
+        "symbol": "KQ.i@SHFE.fu",
+    },
+    {
+        "symbol": "KQ.i@SHFE.au",
+    },
+    {
+        "symbol": "KQ.i@SHFE.ag",
+    },
+    {
+        "symbol": "KQ.i@SHFE.cu",
+    },
+
+    {
+        "symbol": "KQ.i@DCE.p",
+    },
+    {
+        "symbol": "KQ.i@DCE.y",
+    },
+    {
+        "symbol": "KQ.i@DCE.jd",
+    },
+
+    {
+        "symbol": "KQ.i@CZCE.SR",
+    },
+    {
+        "symbol": "KQ.i@CZCE.TA",
+    },
+    {
+        "symbol": "KQ.i@CZCE.CF",
+    },
+    {
+        "symbol": "KQ.i@CZCE.MA",
+    },
+]
+
+
+

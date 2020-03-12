@@ -3,7 +3,7 @@ import sqlite3
 import time
 import pandas as pd
 
-from configs.main_configs import load_settings
+from configs import load_settings
 
 SETTINGS = load_settings()
 

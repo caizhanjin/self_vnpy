@@ -36,13 +36,14 @@ CFFEX.IO2002-C-3550 - 中金所沪深300股指期权
 KQ.m@CFFEX.IF - 中金所IF品种主连合约
 KQ.i@SHFE.bu - 上期所bu品种指数
 """
+
 from datetime import date
 from contextlib import closing
 from tqsdk import TqApi, TqSim
 from tqsdk.tools import DataDownloader
 from os import path
 
-from configs.main_configs import load_settings
+from configs import load_settings
 from libs.db.sqlite import DatabaseSqlite
 
 
@@ -52,20 +53,54 @@ default_settings = {
     "save_path": SETTINGS["tqdata_save_path"],
     "cycle": 1 * 60,  # 1min
     "interval": "1m",
-    "start_dt": date(2020, 3, 5),
-    "end_dt": date(2020, 3, 8),
-
+    "start_dt": date(2010, 1, 1),
+    "end_dt": date(2020, 3, 12),
 }
 
 download_list = [
     {
+        "symbol": "KQ.i@SHFE.rb",
+    },
+    {
         "symbol": "KQ.i@SHFE.bu",
+    },
+    {
+        "symbol": "KQ.i@SHFE.ru",
+    },
+    {
+        "symbol": "KQ.i@SHFE.fu",
+    },
+    {
+        "symbol": "KQ.i@SHFE.au",
+    },
+    {
+        "symbol": "KQ.i@SHFE.ag",
     },
     {
         "symbol": "KQ.i@SHFE.cu",
     },
+
     {
-        "symbol": "SHFE.cu2005",
+        "symbol": "KQ.i@DCE.p",
+    },
+    {
+        "symbol": "KQ.i@DCE.y",
+    },
+    {
+        "symbol": "KQ.i@DCE.jd",
+    },
+
+    {
+        "symbol": "KQ.i@CZCE.SR",
+    },
+    {
+        "symbol": "KQ.i@CZCE.TA",
+    },
+    {
+        "symbol": "KQ.i@CZCE.CF",
+    },
+    {
+        "symbol": "KQ.i@CZCE.MA",
     },
 ]
 
@@ -153,7 +188,7 @@ def download_and_sync():
 
 
 if __name__ == "__main__":
-    # download()
+    download()
 
     # csv_path_list = [
     #     "C:\\self_vnpy\\history_data\\tq\\KQ.i@SHFE.bu_1m_20200305_20200308.csv",
@@ -162,6 +197,6 @@ if __name__ == "__main__":
     # ]
     # sync_db(csv_path_list)
 
-    download_and_sync()
+    # download_and_sync()
 
 

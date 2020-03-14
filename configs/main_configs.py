@@ -1,8 +1,6 @@
 import json
 import os
 
-from .log_config import initialize_logging
-
 BASE_PATH = os.path.dirname(__file__)
 ROOT_PATH = os.path.dirname(BASE_PATH)
 JSON_PATH = os.path.join(BASE_PATH, "json")
@@ -12,9 +10,6 @@ def load_settings():
     SETTINGS_PATH = os.path.join(JSON_PATH, "settings.json")
     with open(SETTINGS_PATH, "r", encoding="utf8") as f:
         SETTINGS = json.load(f)
-
-    if not os.path.exists(SETTINGS["tqdata_path"]):
-        os.makedirs(SETTINGS["tqdata_path"])
 
     return SETTINGS
 
@@ -26,6 +21,5 @@ def load_futures():
     return FUTURES
 
 
-def init_logging():
-    """初始化log配置"""
-    initialize_logging(ROOT_PATH)
+
+

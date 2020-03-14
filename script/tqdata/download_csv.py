@@ -45,12 +45,12 @@ from os import path
 
 from configs import load_settings
 from libs.db.sqlite import DatabaseSqlite
-
+from libs.file import list_current_paths
 
 SETTINGS = load_settings()
 
 default_settings = {
-    "save_path": SETTINGS["tqdata_save_path"],
+    "save_path": SETTINGS["tqdata_path"],
     "cycle": 1 * 60,  # 1min
     "interval": "1m",
     "start_dt": date(2010, 1, 1),
@@ -183,20 +183,20 @@ def sync_db(csv_paths: list):
 
 def download_and_sync():
     """下载并同步数据库"""
-    csv_path_list = download(return_paths=True)
-    sync_db(csv_path_list)
+    csv_paths = download(return_paths=True)
+    sync_db(csv_paths)
 
 
 if __name__ == "__main__":
-    download()
+    # download()
 
     # csv_path_list = [
     #     "C:\\self_vnpy\\history_data\\tq\\KQ.i@SHFE.bu_1m_20200305_20200308.csv",
     #     "C:\\self_vnpy\\history_data\\tq\\SHFE.cu2005_1m_20200305_20200308.csv",
     #     "C:\\self_vnpy\\history_data\\tq\\KQ.i@SHFE.cu_1m_20200305_20200308.csv"
     # ]
-    # sync_db(csv_path_list)
+    csv_path_list = list_current_paths(SETTINGS["tqdata_path"], ".csv")
+    sync_db(csv_path_list)
 
     # download_and_sync()
-
 

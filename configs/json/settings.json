@@ -1,4 +1,5 @@
 {
   "sqlite_db_path": "C:\\self_vnpy\\environments\\database.db",
-  "tqdata_path": "C:\\self_vnpy\\history_data\\tq"
+  "tq_99_save": "C:\\self_vnpy\\history_data\\tq\\99_save",
+  "tq_99": "C:\\self_vnpy\\history_data\\tq\\99"
 }

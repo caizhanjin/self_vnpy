@@ -7,14 +7,19 @@ BASE_PATH = os.path.dirname(__file__)
 ROOT_PATH = os.path.dirname(BASE_PATH)
 JSON_PATH = os.path.join(BASE_PATH, "json")
 
+if not os.path.exists(JSON_PATH):
+    os.makedirs(JSON_PATH)
+
 
 def load_settings():
     SETTINGS_PATH = os.path.join(JSON_PATH, "settings.json")
     with open(SETTINGS_PATH, "r", encoding="utf8") as f:
         SETTINGS = json.load(f)
 
-    if not os.path.exists(SETTINGS["tqdata_path"]):
-        os.makedirs(SETTINGS["tqdata_path"])
+    if not os.path.exists(SETTINGS["tq_99_save"]):
+        os.makedirs(SETTINGS["tq_99_save"])
+    if not os.path.exists(SETTINGS["tq_99"]):
+        os.makedirs(SETTINGS["tq_99"])
 
     return SETTINGS
 

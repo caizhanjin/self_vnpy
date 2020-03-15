@@ -14,4 +14,4 @@ class SampleBarData(object):
     low_price: float = 0
     close_price: float = 0
     volume: float = 0
-
+    open_interest: float = 0

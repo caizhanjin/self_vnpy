@@ -46,6 +46,7 @@ from os import path
 from configs import load_settings
 from libs.db.sqlite import DatabaseSqlite
 from libs.file import list_current_paths
+from tools.file import DealCsv
 
 SETTINGS = load_settings()
 
@@ -199,4 +200,10 @@ if __name__ == "__main__":
     sync_db(csv_path_list)
 
     # download_and_sync()
+
+    # 处理csv为vnpy导入
+    # source_path = SETTINGS["tq_99_save"]
+    # deal_path = SETTINGS["tq_99"]
+    #
+    # DealCsv.clean_csv_file(source_path, deal_path)
 

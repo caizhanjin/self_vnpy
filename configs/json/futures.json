@@ -74,7 +74,7 @@
   "SR": {
     "name": "白糖",
     "exchange_name": "上期所",
-    "exchange_code": "SHFE",
+    "exchange_code": "CZCE",
     "multiplier": 10,
     "minimum_change": 1
   },

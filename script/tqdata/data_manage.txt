@@ -2,18 +2,18 @@ Local History Data：
 
 ------------------Time from 2010-1-1 ~ 2020-3-12------------------
 SHFE 上期所
-RB 螺纹钢
-BU 沥青
-RU 橡胶
-FU 燃油
-AU 黄金
-AG 白银
-CU 铜
+rb 螺纹钢
+bu 沥青
+ru 橡胶
+fu 燃油
+au 黄金
+ag 白银
+cu 铜
 
 DCE 大商所
-P 棕榈
-Y 豆油
-JD 鸡蛋
+p 棕榈
+y 豆油
+jd 鸡蛋
 
 CZCE 郑商所
 SR 白糖
